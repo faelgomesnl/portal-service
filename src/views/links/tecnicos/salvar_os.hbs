@@ -1,0 +1,256 @@
+<div class="container p-2">
+    <div class="row">
+        <div class="col-sm">
+
+            <div class="card">
+                <div class="card-body">
+                    <form{{!-- action="/links/tecnicos/" --}} method="POST" name="form">
+                        <b>Defeito:</b>
+                        <div class="form-group">
+                            <textarea type="text" name="solucao"
+                                class="form-control">{{#each geral}}{{DEFEITO}}{{/each}}</textarea>
+
+                        </div>
+
+                        <div class="table-responsive-sm">
+
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Executante:</b></td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select class="select-css" name="contrato" id="list"
+                                                    onChange="update()">
+                                                    <option selected disabled></option>
+                                                    {{#each cont}}
+                                                    <option value="{{CODUSU}}" id="{{NUMOS}}">
+                                                        {{NOMEUSU}}
+                                                    </option>
+                                                    {{/each}}
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td><b>Prioridade:</b></td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select class="select-css" name="contato" id="list2"
+                                                    onChange="update2()">
+                                                    <option value=""></option>
+                                                    <option id="1">1</option>
+                                                    <option id="2">2</option>
+                                                    <option id="3">3</option>
+
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><b>Motivo:</b></td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select class="select-css" name="contrato" id="list3"
+                                                    onChange="update3()">
+                                                    <option selected disabled></option>
+                                                    {{#each motivo}}
+                                                    <option id="{{CODOCOROS}}">
+                                                        {{DESCROCOROS}}
+                                                    </option>
+                                                    {{/each}}
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td><b>Status:</b></td>
+                                        <td>
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <select class="select-css" name="contrato" id="list4"
+                                                        onChange="update4()">
+                                                        <option selected disabled></option>
+                                                        {{#each statusit}}
+                                                        <option id="{{CODSIT}}">
+                                                            {{DESCRICAO}}
+                                                        </option>
+                                                        {{/each}}
+                                                    </select>
+                                                </div>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><b>Data Execução:</b></td>
+                                        <td><input type="date" name="dte" id="dte" required></td>
+                                        <td><b>Hora Inicial:</b></td>
+                                        <td><input type="time" value="hhmm" name="hi" id="hi" required></td>
+                                        <td><b>Hora Final:</b></td>
+                                        <td><input type="time" value="hhmm" name="hf" id="hf" required></td>
+                                    </tr>
+                                <tbody>
+                            </table>
+                            <b>Solução:</b>
+                            <div class="form-group">
+                                <textarea type="text" name="solucao"
+                                    class="form-control">{{#each geral}}{{SOLUCAO}}{{/each}}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                {{!-- DADOS ENVIADOS PARA O POST (SALVAR, ENCAMINHAR E FECHAR OS's) --}}
+                                <input hidden id="value" name="value" required>
+                                <input hidden id="prioridade" name="prioridade">
+                                <input hidden id="motivo" name="motivo">
+                                <input hidden id="statusi" name="statusi">
+                                <input hidden id="numos" name="numos">
+                                <input hidden id="numitem" name="numitem" value={{#each item}}{{NUMITEM}}{{/each}}>
+                                <input hidden id="fechar" name="fechar" value={{#each fechar}}{{ABERTAS}}{{/each}}>
+
+                                {{!-- ENCAINHAR OS --}}
+                                <input hidden id="codprod" name="codprod" value={{#each geral}}{{CODPROD}}{{/each}}>
+                                <input hidden id="codserv" name="codserv" value={{#each geral}}{{CODSERV}}{{/each}}>
+                                <input hidden id="codusurem" name="codusurem" value={{#each geral}}{{CODUSUREM}}{{/each}}>
+
+                            </div>
+                            <div>
+                                <button class="btn btn-success btn-block" id="btsalvar"
+                                    onclick="javascript: form.action='/links/tecnicos/salvar_os'; save()">
+                                    Salvar Ordem De Serviço
+                                </button>
+                                <button class="btn btn-success btn-block" id="btencaminhar"
+                                    onclick="javascript: form.action='/links/tecnicos/encaminhar_os'; forward()">
+                                    Encaminhar Ordem De Serviço
+                                </button>
+                                <button class="btn btn-success btn-block" id="btfechar"
+                                    onclick="javascript: form.action='/links/tecnicos/fechar_os';fch() ">
+                                    Fechar Ordem De Serviço
+                                </button>
+                            </div>
+                            </form>
+                        </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        function save() {
+            if (document.getElementById("value").value == "") {
+                alert('Defina Executante');
+                document.getElementById("value").focus();
+                return false
+            }
+        }
+
+        function fch() {
+            if (document.getElementById("value").value == "") {
+                alert('Defina Executante');
+                document.getElementById("value").focus();
+                return false
+            }
+
+            if (document.getElementById("motivo").value == "") {
+                alert('Defina Motivo');
+                document.getElementById("motivo").focus();
+                return false
+            }
+            if (document.getElementById("statusi").value == "") {
+                alert('Defina Status Item');
+                document.getElementById("statusi").focus();
+                return false
+            }
+
+            if (document.getElementById("dte").value == "") {
+                alert('Defina Data De Execução');
+                document.getElementById("dte").focus();
+                return false
+            }
+            if (document.getElementById("hi").value == "") {
+                alert('Defina Hora Inicial');
+                document.getElementById("hi").focus();
+                return false
+            }
+            if (document.getElementById("hf").value == "") {
+                alert('Defina Hora Final');
+                return false
+            }
+
+            if (document.getElementById("fechar").value != 0) {
+                alert('Não é possível finalizar OS, existem itens abertos');
+                document.getElementById("btfechar").disabled = true;
+                document.location.reload(true);
+            }
+        }
+
+        function forward() {
+            if (document.getElementById("value").value == "") {
+                alert('Defina Executante');
+                document.getElementById("value").focus();
+                return false
+            }
+
+            if (document.getElementById("motivo").value == "") {
+                alert('Defina Motivo');
+                document.getElementById("motivo").focus();
+                return false
+            }
+            if (document.getElementById("statusi").value == "") {
+                alert('Defina Status Item');
+                document.getElementById("statusi").focus();
+                return false
+            }
+            if (document.getElementById("dte").value == "") {
+                alert('Defina Data De Execução');
+                document.getElementById("dte").focus();
+                return false
+            }
+            if (document.getElementById("hi").value == "") {
+                alert('Defina Hora Inicial');
+                document.getElementById("hi").focus();
+                return false
+            }
+            if (document.getElementById("hf").value == "") {
+                alert('Defina Hora Final');
+                document.getElementById("hf").focus();
+                return false
+            }
+        }
+
+        function update() {
+            var select = document.getElementById('list');
+            var option = select.options[select.selectedIndex];
+
+            //busca valor executante
+            var contrato = option.value;
+            var contr = contrato.toString();
+            document.getElementById('value').value = option.value;
+            document.getElementById('numos').value = option.id;
+        }
+
+        function update2() {
+            //busca prioridade
+            var select = document.getElementById('list2');
+            var option = select.options[select.selectedIndex];
+            document.getElementById('prioridade').value = option.id
+            var priori = option.id
+        }
+
+        function update3() {
+            var select = document.getElementById('list3');
+            var option = select.options[select.selectedIndex];
+            document.getElementById('motivo').value = option.id
+            var priori = option.id
+        }
+
+        function update4() {
+            var select = document.getElementById('list4');
+            var option = select.options[select.selectedIndex];
+            document.getElementById('statusi').value = option.id
+            var priori = option.id
+        }
+
+
+    </script>

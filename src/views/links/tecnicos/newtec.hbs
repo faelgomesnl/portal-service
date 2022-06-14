@@ -1,0 +1,66 @@
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+
+            <div class="card">
+                <div class="card-body">
+                    <form action="/links/tecnicos/newtec" method="POST">                        
+                        
+                        
+                        <div class="form-group">
+                            <select class="select-css" name="login" id="list" onChange="update2()">                                
+                                <option selected disabled>Executante </option>
+                                
+                                {{#each lista}}                                    
+                                    <option title="{{CODUSU}}"
+                                            id="{{NOMEUSU}}">
+                                                {{NOMEUSU}}
+                                    </option>                                   
+                                    
+                                {{/each}}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="password" name="senha" class="form-control" placeholder="Senha" >
+                        </div> 
+
+                         <input hidden id="codusu" name="codusu" required>
+                         <input hidden id="nomeusu" name="nomeusu" required>
+                        
+                        <div class="form-group">
+                            <button class="btn btn-success btn-block">
+                                Registrar Contrato
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{{!-- RECEBE O VALOR INFORMADO NO SELECT A TRIBUI A INPUT PARA REGISTRAR O CODPARC --}}
+<script type="text/javascript">   
+    
+    
+    function update() {
+				var select = document.getElementById('list');
+				var option = select.options[select.selectedIndex];
+				
+                console.log(document.getElementById('value').value = option.text)	
+                document.getElementById('codprod').value = option.title; 
+
+                //document.getElementById('numcontrat').value = option.id;			
+			}
+    
+    //insere o código do contato no respectivo input
+            function update2(){
+                var select = document.getElementById('list'); 
+				var option = select.options[select.selectedIndex];
+
+                document.getElementById('codusu').value= option.title;
+				document.getElementById('nomeusu').value = option.id;
+            }
+		</script>

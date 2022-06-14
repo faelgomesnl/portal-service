@@ -1,0 +1,124 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/signin">
+      {{!-- <i class="fas fa-link"></i> --}}
+      <img src="/img/lg1.png" alt="Logo Fazt" height="50" width="185">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+
+        {{#if user.ADMINISTRADOR}}
+
+        <li class="nav-item">
+          <a class="nav-link" href="/links/allogin">Usuários</a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Cadastros
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/links/newuser">Cadastro Usuários</a>
+            <a class="dropdown-item" href="/links/newcont">Cadastro Contratos</a>
+          </div>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+        </li>
+        {{else}}
+
+        {{!-- ADMIN TÉCNICO --}}
+        {{#if user.ADMIN_TEC}}
+
+        <li class="nav-item">
+          <a class="nav-link" href="/links/tecnicos/allogin">Executantes</a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Cadastros
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/links/tecnicos/newtec">Cadastro Técnico</a>
+            <a class="dropdown-item" href="/links/tecnicos/vincular">Vincular Técnico</a>
+          </div>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+        </li>
+        {{else}}
+
+        {{!-- ACESSO OS'S TÉCNICOS --}}
+        {{#if user.AD_TECNICOSC}}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Ordem De Serviço
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/links/tecnicos/abertas">OS Abertas</a>
+            <a class="dropdown-item" href="/links/tecnicos/fechadas">OS Fechadas</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+
+        {{else}}
+
+        {{!-- acesso OS's internas --}}
+        {{#if user.AD_SERVICE}}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Ordem De Serviço
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/links">OS Abertas</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/links/orderserv">Abertura De OS</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+        {{else}}
+        {{#if user}}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Ordem De Serviço
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/links">OS Abertas</a>
+            <a class="dropdown-item" href="/links/osclose">OS Fechadas</a>
+            <a class="dropdown-item" href="/links/all">Lista Geral</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/links/orderserv">Abertura De OS</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+
+        {{else}}
+        <li class="nav-item">
+          <a class="nav-link" href="/signin">Login</a>
+        </li>
+        {{/if}}
+        {{/if}}
+        {{/if}}
+        {{/if}}
+        {{/if}}
+      </ul>
+    </div>
+  </div>
+</nav>
