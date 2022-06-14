@@ -9,9 +9,7 @@
                         <div class="form-group">
                             <textarea type="text" name="solucao"
                                 class="form-control">{{#each geral}}{{DEFEITO}}{{/each}}</textarea>
-
                         </div>
-
                         <div class="table-responsive-sm">
 
                             <table>
@@ -40,7 +38,6 @@
                                                     <option id="1">1</option>
                                                     <option id="2">2</option>
                                                     <option id="3">3</option>
-
                                                 </select>
                                             </div>
                                         </td>
@@ -81,7 +78,6 @@
                                         <td></td>
                                         <td></td>
                                     </tr>
-
                                     <tr>
                                         <td><b>Data Execução:</b></td>
                                         <td><input type="date" name="dte" id="dte" required></td>
@@ -111,7 +107,8 @@
                                 {{!-- ENCAINHAR OS --}}
                                 <input hidden id="codprod" name="codprod" value={{#each geral}}{{CODPROD}}{{/each}}>
                                 <input hidden id="codserv" name="codserv" value={{#each geral}}{{CODSERV}}{{/each}}>
-                                <input hidden id="codusurem" name="codusurem" value={{#each geral}}{{CODUSUREM}}{{/each}}>
+                                <input hidden id="codusurem" name="codusurem" value={{#each
+                                    geral}}{{CODUSUREM}}{{/each}}>
 
                             </div>
                             <div>
