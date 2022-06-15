@@ -80,9 +80,13 @@
                                     </tr>
                                     <tr>
                                         <td><b>Data Execução:</b></td>
-                                        <td><input type="date" name="dte" id="dte" required></td>
+                                        <td><input type="date" name="dte" id="dte" required></td>                                        
+                                    </tr>
+                                    <tr>
                                         <td><b>Hora Inicial:</b></td>
-                                        <td><input type="time" value="hhmm" name="hi" id="hi" required></td>
+                                        <td><input type="time" value="hhmm" name="hi" id="hi" required></td> 
+                                    </tr>
+                                    <tr>
                                         <td><b>Hora Final:</b></td>
                                         <td><input type="time" value="hhmm" name="hf" id="hf" required></td>
                                     </tr>
@@ -138,6 +142,16 @@
             if (document.getElementById("value").value == "") {
                 alert('Defina Executante');
                 document.getElementById("value").focus();
+                return false
+            }
+             if (document.getElementById("motivo").value == "") {
+                alert('Defina Motivo');
+                document.getElementById("motivo").focus();
+                return false
+            }
+            if (document.getElementById("statusi").value == "") {
+                alert('Defina Status Item');
+                document.getElementById("statusi").focus();
                 return false
             }
         }

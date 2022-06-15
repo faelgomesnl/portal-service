@@ -882,7 +882,7 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
 
     //OS SELECIONADA TÉCNICO PARA SALVAR 
     const links = await pool.query(`SELECT O.NUMOS,
-    CONVERT(NVARCHAR(MAX),O.DESCRICAO)AS DEFEITO,I.CODPROD,I.CODSERV, AC.CODUSU AS CODUSUREM
+    CONVERT(NVARCHAR(MAX),O.DESCRICAO)AS DEFEITO,I.CODPROD,I.CODSERV, AC.CODUSU AS CODUSUREM, CONVERT(NVARCHAR(MAX),I.SOLUCAO) AS SOLUCAO
     FROM sankhya.TCSOSE O
         INNER JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)
         INNER JOIN sankhya.TGFPAR P ON (P.CODPARC=C.CODPARC)
@@ -894,7 +894,7 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
         AND I.TERMEXEC IS NULL
         AND L.CODLOGIN = ${idlogin}
         AND I.NUMOS =${numos}
-    GROUP BY O.NUMOS,CONVERT(NVARCHAR(MAX),O.DESCRICAO),I.CODPROD,I.CODSERV,AC.CODUSU`);
+    GROUP BY O.NUMOS,CONVERT(NVARCHAR(MAX),O.DESCRICAO),I.CODPROD,I.CODSERV,AC.CODUSU,CONVERT(NVARCHAR(MAX),I.SOLUCAO)`);
 
     const links2 = await pool.query(`SELECT I.NUMOS, TC.CODUSUREL, U.NOMEUSU, U.CODUSU
         FROM sankhya.TCSITE I
@@ -957,9 +957,9 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
         INNER JOIN sankhya.TCSITS IT ON (IT.CODSIT=I.CODSIT)
         INNER JOIN sankhya.AD_ACESSOTEC AC ON (AC.CODUSU = I.CODUSU)
         INNER JOIN sankhya.AD_TBLOGIN L ON (L.CODLOGIN=AC.CODLOGIN)
-    WHERE 
-            L.CODLOGIN = ${idlogin}
-        AND I.NUMOS =${numos}
+    --WHERE 
+            --L.CODLOGIN = ${idlogin}
+        --AND I.NUMOS =${numos}
     GROUP BY I.CODSIT, IT.DESCRICAO
     ORDER BY IT.DESCRICAO`);
 
