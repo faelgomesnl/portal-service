@@ -10,19 +10,19 @@ passport.use('local.signin', new LocalStrategy({
   usernameField: 'nomeusu',
   passwordField: 'senha',
   passReqToCallback: true
-}, async (req, nomeusu, senha, done) => {    
+}, async (req, nomeusu, senha, done) => {
   const rows = await pool.query(`SELECT * FROM sankhya.AD_TBLOGIN WHERE NOMEUSU= '${nomeusu}'`);
   if (rows.recordset.length > 0) {
-      const user = rows.recordset[0];      
-     
-      if (senha == user.SENHA) {
-        done(null, user, req.flash('success','Bem Vindo ' + user.NOMEUSU));
-      } else {
-        done(null, false, req.flash('message', 'Senha Incorreta'));
-      } 
+    const user = rows.recordset[0];
+
+    if (senha == user.SENHA) {
+      done(null, user, req.flash('success', 'Bem Vindo ' + user.NOMEUSU));
+    } else {
+      done(null, false, req.flash('message', 'Senha Incorreta'));
+    }
   } else {
     return done(null, false, req.flash('message', 'Usuário Não Existe!'));
-  } 
+  }
 }));
 
 //CADASTRAR USUÁRIO/ OS (só adaptar a criação de OS)
@@ -32,7 +32,9 @@ passport.use('local.signup', new LocalStrategy({
   passReqToCallback: true
   //recebe os dados 
 }, async (req, nomeusu, senha, done) => {
-  const { fullname } = req.body;
+  const {
+    fullname
+  } = req.body;
   const newUser = {
     nomeusu,
     senha,
@@ -45,15 +47,13 @@ passport.use('local.signup', new LocalStrategy({
   return done(null, newUser);
 }));
 
-passport.serializeUser((user, done) => {  
+passport.serializeUser((user, done) => {
   done(null, user.CODLOGIN);
 });
 
 passport.deserializeUser(async (id, done) => {
-  
+
   const rows = await pool.query(`SELECT * FROM sankhya.AD_TBLOGIN WHERE CODLOGIN = ${id}`);
   //console.log(rows)
   done(null, rows.recordset[0]);
 });
-
-

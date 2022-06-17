@@ -970,6 +970,8 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
         AND I.NUMOS =${numos} 
         AND I.NUMITEM <> (SELECT MAX(NUMITEM) FROM sankhya.TCSITE WHERE NUMOS = ${numos} )`);
 
+    pool.query(`UPDATE sankhya.AD_TBLOGIN SET ULTIMO_ACESSO = GETDATE() WHERE CODLOGIN= ${idlogin}`);
+
     res.render('links/tecnicos/salvar_os', {
         geral: links.recordset,
         cont: links2.recordset,
@@ -1007,7 +1009,7 @@ router.post('/tecnicos/salvar_os', isLoggedIn, async (req, res) => {
     pool.query(`UPDATE sankhya.TCSITE
     SET CODUSU =${codusuario} ,PRIORIDADE =${prioridade} ,SOLUCAO ='${solucao}' ,CODOCOROS=${motivo} ,
     CODSIT=${statusit} ,HRINICIAL=${horai1} ,HRFINAL=${horaf1} ,INICEXEC= '${dataex}',TERMEXEC = '${tremexec}'
-    WHERE NUMOS =${numos}
+    WHERE NUMOS =${numos} 
         AND NUMITEM =${numitem}`);
 
     req.flash('success', 'Ordem De Serviço Salva com Sucesso!!!!')
@@ -1080,6 +1082,34 @@ router.post('/tecnicos/fechar_os', isLoggedIn, async (req, res) => {
     WHERE NUMOS =${numos}`);
 
     req.flash('success', 'Ordem De Serviço Finalizada com Sucesso!!!!')
+    res.redirect('/links/tecnicos/abertas')
+});
+
+//update
+//ADICIONAR CONTRATOS AOS NOVOS USUÁRIOS, SOMENTE ADMIN
+router.get('/password', isLoggedIn, async (req, res) => {
+
+
+    res.render('links/passwords')
+});
+
+//update
+//ATUALIZAR SENHA DO USUÁRIO
+router.post('/password', isLoggedIn, async (req, res) => {
+    const idlogin = req.user.CODLOGIN
+    const contrato = req.body.contrato;
+
+    /* console.log('contrato')
+    console.log(contrato)
+
+    console.log('login')
+    console.log(idlogin) */
+
+    pool.query(`UPDATE sankhya.AD_TBLOGIN
+            SET SENHA = '${contrato}'
+            WHERE CODLOGIN = '${idlogin}'`);
+
+    req.flash('success', 'Senha atualizada com Sucesso!!!!')
     res.redirect('/links/tecnicos/abertas')
 });
 
