@@ -82,10 +82,6 @@
                             </select>
                         </div>
 
-                        {{!-- <div class="form-group">
-                            <input type="file" name="file"><br>
-                        </div> --}}
-
                         {{!-- armazena valores envio req.body insert --}}
                         <div class="form-group">
                             <input hidden id="value" required>
@@ -108,6 +104,123 @@
                                 Gerar Ordem De Serviço
                             </button>
                         </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{{else}}
+
+{{#if user.AD_SERVICE}}
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-5 mx-auto">
+
+            <div class="card">
+                <div class="card-body">
+                    <form action="/links/orderserv" method="POST" id="frm_" enctype="multipart/form-data">
+
+
+                        <div class="form-group">
+                            <textarea type="text" name="texto" class="form-control"
+                                placeholder="Informe a descrição e os respectivos contatos">Nome:
+Setor:
+Ramal:
+Descrição Do Problema:</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <select class="select-css" name="contrato" id="list" onChange="update()">
+                                <option selected disabled>Contrato/ Parceiro </option>
+                                <option selected disabled>Escolha Uma Localidade </option>
+
+                                {{#each geral}}
+                                <option value="{{NUM_CONTRATO}}" id="{{CODPARC}}" title="{{CODPROD}}"
+                                    ren="{{VALORTEMPO}}" ren2="{{CIDADE}}" ren3="{{LOGRADOURO}}" ren4="{{NOMEPARC}}"
+                                    ren5="{{CARTEIRA}}" ren6="{{CODUSUOS}}">
+                                    {{NOMEPARC}}
+                                </option>
+                                {{/each}}
+                            </select>
+                        </div>
+
+                        {{!-- escolha de produto --}}
+                        <div class="form-group" hidden>
+                            <select class="select-css" name="produto" id="list3" onChange="update()">
+                                {{#each prod}}
+                                <option value="{{PRODUTO}}" id="{{PRODUTO}}">
+                                    {{PRODUTO}}
+                                </option>
+                                {{/each}}
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="updiv">
+                            <select class="select-css" name="contato" id="aqui2" onclick="update4()" required>
+                                <option value="" disabled selected>Escolha Um Serviço</option>
+                            </select>
+                        </div>
+
+                        {{!-- escolha de serviço --}}
+                        <div class="form-group" hidden>
+                            <select class="select-css" name="produto" id="list4" onChange="update()">
+                                {{#each prod1}}
+                                <option value="{{PRODUTO}}" id="{{PRODUTO}}">
+                                    {{PRODUTO}}
+                                </option>
+                                {{/each}}
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="updiv">
+                            <select class="select-css" name="contato" id="aqui3" onclick="update3()" required>
+                                <option value="" disabled selected>Escolha Um Produto</option>
+                            </select>
+                        </div>
+
+                        {{!-- escolha de contato --}}
+                        <div class="form-group" hidden>
+                            <select class="select-css" name="contato" id="list2" onChange="update()">
+
+                                {{#each cont}}
+                                <option value="{{CONTATO}}" id="{{NOME}}">
+                                    {{CONTATO}}
+                                </option>
+                                {{/each}}
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="updiv">
+                            <select class="select-css" name="contato" id="aqui" onclick="update2()" required>
+                                <option value="" disabled selected>Escolha Contato Responsável</option>
+                            </select>
+                        </div>
+
+                        {{!-- armazena valores envio req.body insert --}}
+                        <div class="form-group">
+                            <input hidden id="value" required>
+                            <input hidden id="codparc" name="codparc" required>
+                            <input hidden id="codprod" name="codprod" required>
+                            <input hidden id="codserv" name="codserv" required>
+                            <input hidden id="atualiza" name="atualiza" required>
+                            <input hidden id="sla" name="sla">
+                            <input hidden id="carteira" name="carteira" required>
+                            <input hidden id="usuweb" name="usuweb" required>
+
+                            {{!-- exibição enderaço --}}
+                            <input type="text" id="cidade" name="cidade" disabled="disabled" style='width:100%'>
+                            <input type="text" id="logradouro" name="logradouro" disabled="disabled" style='width:100%'>
+                            <input type="text" id="parceiro" name="parceiro" disabled="disabled" style='width:100%'>
+                        </div>
+
+                        <div class="form-group">
+                            <button class="btn btn-success btn-block" onclick="valida()">
+                                Gerar Ordem De Serviço
+                            </button>
                     </form>
 
                 </div>
@@ -199,10 +312,6 @@
                             </select>
                         </div>
 
-                        {{!-- <div class="form-group">
-                            <input type="file" name="file"><br>
-                        </div> --}}
-
                         {{!-- armazena valores envio req.body insert --}}
                         <div class="form-group">
                             <input hidden id="value" required>
@@ -215,9 +324,9 @@
                             <input hidden id="usuweb" name="usuweb" required>
 
                             {{!-- exibição enderaço --}}
-                            <input type="text" id="cidade" name="cidade" disabled="disabled" style='width:100%'>
-                            <input type="text" id="logradouro" name="logradouro" disabled="disabled" style='width:100%'>
-                            <input type="text" id="parceiro" name="parceiro" disabled="disabled" style='width:100%'>
+                            <input hidden type="text" id="cidade" name="cidade" disabled="disabled" style='width:100%'>
+                            <input hidden type="text" id="logradouro" name="logradouro" disabled="disabled" style='width:100%'>
+                            <input hidden type="text" id="parceiro" name="parceiro" disabled="disabled" style='width:100%'>
                         </div>
 
                         <div class="form-group">
@@ -232,6 +341,7 @@
 
     </div>
 </div>
+{{/if}}
 {{/if}}
 
 {{!-- RECEBE O VALOR INFORMADO NO SELECT A TRIBUI A INPUT PARA REGISTRAR O CODPARC --}}

@@ -499,10 +499,9 @@ router.post('/orderserv', isLoggedIn, upload.single('file'), async (req, res) =>
     await pool.query(`INSERT INTO sankhya.TCSOSE (NUMOS,NUMCONTRATO,DHCHAMADA,DTPREVISTA,CODPARC,CODCONTATO,CODATEND,CODUSURESP,DESCRICAO,SITUACAO,CODCOS,CODCENCUS,CODOAT,POSSUISLA) VALUES 
     ('${numos}','${contrato}',GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),'${parceiro}','${contato}',110,110,'${texto}','P','',30101,1000000,'S');
     INSERT INTO SANKHYA.TCSITE (NUMOS,NUMITEM,CODSERV,CODPROD,CODUSU,CODOCOROS,CODUSUREM,DHENTRADA,DHPREVISTA,CODSIT,COBRAR,RETRABALHO) VALUES 
-    ('${numos}',1,'${produto}','${servico}','${uweb}','${cart}',110,GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),15,'N','N');
-    INSERT INTO sankhya.TSIATA (CODATA,DESCRICAO,ARQUIVO,CONTEUDO,CODUSU,DTALTER,TIPO) VALUES ('${numos}','ANEXO','${filetoupload}','${filetoupload}',1006,GETDATE(),'W')`);
+    ('${numos}',1,'${produto}','${servico}','${uweb}','${cart}',110,GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),15,'N','N')`);
 
-    req.flash('success', 'Ordem De Serviço Criada com Sucesso!!!!')
+    req.flash('success', 'Ordem De Serviço Criada com Sucesso!!!! Nº: ',numos)
     res.redirect('/links')
 
 });
@@ -517,12 +516,13 @@ router.get('/', isLoggedIn, async (req, res) => {
     O.NUMOS, 
     I.NUMITEM,
     USU.NOMEUSU AS EXECUTANTE,
-    CONVERT(VARCHAR(30),O.DHCHAMADA,103)+' '+ CONVERT(VARCHAR(30),O.DHCHAMADA,108) AS ABERTURA,
+    FORMAT(O.DHCHAMADA , 'dd/MM/yyyy HH:mm:ss') AS ABERTURA,
+    --CONVERT(VARCHAR(30),O.DHCHAMADA,103)+' '+ CONVERT(VARCHAR(30),O.DHCHAMADA,108) AS ABERTURA,
     CONVERT(VARCHAR(30),O.DTPREVISTA,103)+' '+ CONVERT(VARCHAR(30),O.DTPREVISTA,108) AS PREVISAO,    
-    CASE WHEN I.NUMITEM =1  THEN CONVERT(NVARCHAR(MAX),O.DESCRICAO)
+    /* CASE WHEN I.NUMITEM =1  THEN CONVERT(NVARCHAR(MAX),O.DESCRICAO)
     WHEN CONVERT(NVARCHAR(MAX),I.SOLUCAO) IS NULL  THEN CONVERT(NVARCHAR(MAX),O.DESCRICAO)
-    ELSE CONVERT(NVARCHAR(MAX),I.SOLUCAO)  END AS DEFEITO ,
-    --CONVERT(NVARCHAR(MAX),O.DESCRICAO)AS DEFEITO,
+    ELSE CONVERT(NVARCHAR(MAX),I.SOLUCAO)  END AS DEFEITO , */
+    CONVERT(NVARCHAR(MAX),O.DESCRICAO)AS DEFEITO,
     CONVERT(NVARCHAR(MAX),I.SOLUCAO) AS SOLUCAO,
     CID.NOMECID AS CIDADE,
     UFS.UF,
@@ -547,7 +547,7 @@ router.get('/', isLoggedIn, async (req, res) => {
     WHERE 
     O.NUFAP IS NULL
     AND I.TERMEXEC IS NULL
-    AND I.NUMITEM = (SELECT MAX(NUMITEM) FROM SANKHYA.TCSITE WHERE NUMOS = O.NUMOS AND TERMEXEC IS NULL)
+    --AND I.NUMITEM = (SELECT MAX(NUMITEM) FROM SANKHYA.TCSITE WHERE NUMOS = O.NUMOS AND TERMEXEC IS NULL)
     AND O.DHCHAMADA >= '01/01/2021'
     AND AC.ID_LOGIN= ${idlogin}`);
     res.render('links/list', {
@@ -1004,6 +1004,28 @@ router.post('/tecnicos/salvar_os', isLoggedIn, async (req, res) => {
     const horai1 = rm1.replace(":", "");
     const rm2 = horaf
     const horaf1 = rm2.replace(":", "");
+
+    console.log('codusuario')
+    console.log(codusuario)
+    console.log('prioridade')
+    console.log(prioridade)
+    console.log('motivo')
+    console.log(motivo)
+    console.log('statusit')
+    console.log(statusit)
+    console.log('dataex')
+    console.log(tremexec)
+    console.log('horai1')
+    console.log(horai1)
+    console.log('horaf1')
+    console.log(horaf1)
+    console.log('solucao')
+    console.log(solucao)
+    console.log('numos')
+    console.log(numos)
+    console.log('numitem')
+    console.log(numitem)
+
 
 
     pool.query(`UPDATE sankhya.TCSITE
