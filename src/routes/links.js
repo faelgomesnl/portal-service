@@ -501,7 +501,7 @@ router.post('/orderserv', isLoggedIn, upload.single('file'), async (req, res) =>
     INSERT INTO SANKHYA.TCSITE (NUMOS,NUMITEM,CODSERV,CODPROD,CODUSU,CODOCOROS,CODUSUREM,DHENTRADA,DHPREVISTA,CODSIT,COBRAR,RETRABALHO) VALUES 
     ('${numos}',1,'${produto}','${servico}','${uweb}','${cart}',110,GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),15,'N','N')`);
 
-    req.flash('success', 'Ordem De Serviço Criada com Sucesso!!!! Nº: ',numos)
+    req.flash('success', 'Ordem De Serviço Criada com Sucesso!!!! Nº: ', numos)
     res.redirect('/links')
 
 });
