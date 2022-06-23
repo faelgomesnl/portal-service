@@ -7,8 +7,8 @@
                     <form{{!-- action="/links/tecnicos/" --}} method="POST" name="form">
                         <b>Defeito:</b>
                         <div class="form-group">
-                            <textarea type="text" name="solucao"
-                                class="form-control">{{#each geral}}{{DEFEITO}}{{/each}}</textarea>
+                            <textarea type="text" name="solucao" class="form-control"
+                                disabled>{{#each geral}}{{DEFEITO}}{{/each}}</textarea>
                         </div>
                         <div class="table-responsive-sm">
 
@@ -95,18 +95,18 @@
                             </table>
                             <b>Solução:</b>
                             <div class="form-group">
-                                <textarea type="text" name="solucao"
-                                    class="form-control">{{#each geral}}{{SOLUCAO}}{{/each}}</textarea>
+                                <textarea type="text" name="solucao" class="form-control"
+                                    placeholder="{{#each geral}}{{SOLUCAO}}{{/each}}"></textarea>
                             </div>
 
                             <div class="form-group">
                                 {{!-- DADOS ENVIADOS PARA O POST (SALVAR, ENCAMINHAR E FECHAR OS's) --}}
                                 <input hidden id="value" name="value" required>
-                                <input hidden id="prioridade" name="prioridade">
+                                <input hidden id="prioridade" name="prioridade" value="NULL">
                                 <input hidden id="motivo" name="motivo">
-                                <input hidden id="statusi" name="statusi">
+                                <input hidden id="statusi" name="statusi" required>
                                 <input hidden id="numos" name="numos">
-                                <input hidden id="numitem" name="numitem" value={{#each item}}{{NUMITEM}}{{/each}}>
+                                <input hidden id="numitem" name="numitem" value={{#each geral}}{{NUMITEM}}{{/each}}>
                                 <input hidden id="fechar" name="fechar" value={{#each fechar}}{{ABERTAS}}{{/each}}>
 
                                 {{!-- ENCAINHAR OS --}}

@@ -881,8 +881,8 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
     const numos = params
 
     //OS SELECIONADA TÉCNICO PARA SALVAR 
-    const links = await pool.query(`SELECT O.NUMOS,
-    CONVERT(NVARCHAR(MAX),O.DESCRICAO)AS DEFEITO,I.CODPROD,I.CODSERV, AC.CODUSU AS CODUSUREM, CONVERT(NVARCHAR(MAX),I.SOLUCAO) AS SOLUCAO
+    const links = await pool.query(`SELECT O.NUMOS,I.NUMITEM, CONVERT(NVARCHAR(MAX),O.DESCRICAO)AS DEFEITO, 
+    I.CODPROD,I.CODSERV, AC.CODUSU AS CODUSUREM, CONVERT(NVARCHAR(MAX),I.SOLUCAO) AS SOLUCAO
     FROM sankhya.TCSOSE O
         INNER JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)
         INNER JOIN sankhya.TGFPAR P ON (P.CODPARC=C.CODPARC)
@@ -894,7 +894,7 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
         AND I.TERMEXEC IS NULL
         AND L.CODLOGIN = ${idlogin}
         AND I.NUMOS =${numos}
-    GROUP BY O.NUMOS,CONVERT(NVARCHAR(MAX),O.DESCRICAO),I.CODPROD,I.CODSERV,AC.CODUSU,CONVERT(NVARCHAR(MAX),I.SOLUCAO)`);
+    GROUP BY O.NUMOS,I.NUMITEM,CONVERT(NVARCHAR(MAX),O.DESCRICAO),I.CODPROD,I.CODSERV,AC.CODUSU,CONVERT(NVARCHAR(MAX),I.SOLUCAO)`);
 
     const links2 = await pool.query(`SELECT I.NUMOS, TC.CODUSUREL, U.NOMEUSU, U.CODUSU
         FROM sankhya.TCSITE I
@@ -1042,6 +1042,7 @@ router.post('/tecnicos/encaminhar_os', isLoggedIn, async (req, res) => {
 
     const codusuario = req.body.value;
     const motivo = req.body.motivo;
+    const prioridade = req.body.prioridade;
     const statusit = req.body.statusi;
     const dataex = req.body.dte;
     const horai = req.body.hi;
@@ -1053,6 +1054,16 @@ router.post('/tecnicos/encaminhar_os', isLoggedIn, async (req, res) => {
     const codserv = req.body.codserv;
     const codusurem = req.body.codusurem;
 
+    //CONCATENAR DATA E HORA PARA ADD CAMPO TERMEXEC 
+    const links1 = await pool.query(`select '${dataex}' +' '+'${horaf}'`);
+    const tremexec = Object.values(links1.recordset[0])
+
+    //REMOVER : CAMPO HORA 
+    const rm1 = horai
+    const horai1 = rm1.replace(":", "");
+    const rm2 = horaf
+    const horaf1 = rm2.replace(":", "");
+
     //GERA O NOVO ITEM A SER INSERIDO NA OS 
     const item = await pool.query(`select top (1) NUMITEM +1 as NUMOS from sankhya.TCSITE WHERE NUMOS = ${numos} order by numos desc`);
     const numitem = Object.values(item.recordset[0])
@@ -1061,7 +1072,13 @@ router.post('/tecnicos/encaminhar_os', isLoggedIn, async (req, res) => {
     const tempop = await pool.query(`SELECT convert(varchar, DHPREVISTA,  101) FROM sankhya.TCSITE WHERE NUMOS = ${numos} AND NUMITEM = ${nitem}`);
     const tprevisto = Object.values(tempop.recordset[0])
 
-    pool.query(`INSERT INTO sankhya.TCSITE (NUMOS,NUMITEM, DHPREVISTA, CODUSU,SOLUCAO, CODOCOROS , TEMPPREVISTO,DTALTER,CODUSUALTER,CODUSUREM ,
+    pool.query(`UPDATE sankhya.TCSITE
+    SET CODUSU =${codusuario} ,PRIORIDADE =${prioridade} ,SOLUCAO ='${solucao}' ,CODOCOROS=${motivo} ,
+    CODSIT=${statusit} ,HRINICIAL=${horai1} ,HRFINAL=${horaf1} ,INICEXEC= '${dataex}',TERMEXEC = '${tremexec}'
+    WHERE NUMOS =${numos} 
+        AND NUMITEM =${nitem};
+
+    INSERT INTO sankhya.TCSITE (NUMOS,NUMITEM, DHPREVISTA, CODUSU,SOLUCAO, CODOCOROS , TEMPPREVISTO,DTALTER,CODUSUALTER,CODUSUREM ,
         DHENTRADA, CODSIT ,DHLIMITESLA,CODSERV,CODPROD)
         VALUES (${numos}, ${numitem}, '${dataex}', ${codusuario}, '${solucao}', ${motivo}, ${tprevisto}, GETDATE(), ${codusurem}, ${codusurem}, 
         GETDATE(), ${statusit}, GETDATE(),${codserv}, ${codprod})`);
