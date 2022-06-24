@@ -484,10 +484,18 @@ router.post('/orderserv', isLoggedIn, upload.single('file'), async (req, res) =>
     AND CH.ENTRADA IS NOT NULL
     AND CH.SAIDA IS NOT NULL
 `);
-    const prioridade = 1400
+    const prioridade = Object.values(links2.recordset[0])
+    var prioridadeFinal
+
+    if (prioridade === '') {
+        prioridadeFinal = 1440;
+    } else {
+        prioridadeFinal = prioridade;
+    }
+    //const prioridade = 1400
 
     await pool.query(`INSERT INTO sankhya.TCSOSE (NUMOS,NUMCONTRATO,DHCHAMADA,DTPREVISTA,CODPARC,CODCONTATO,CODATEND,CODUSURESP,DESCRICAO,SITUACAO,CODCOS,CODCENCUS,CODOAT,POSSUISLA) VALUES 
-    ('${numos}','${contrato}',GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),'${parceiro}','${contato}',110,110,'${textofin}','P','',30101,1000000,'S');
+    ('${numos}','${contrato}',GETDATE(),(SELECT DATEADD(MI,${prioridadeFinal},GETDATE())),'${parceiro}','${contato}',110,110,'${textofin}','P','',30101,1000000,'S');
     INSERT INTO SANKHYA.TCSITE (NUMOS,NUMITEM,CODSERV,CODPROD,CODUSU,CODOCOROS,CODUSUREM,DHENTRADA,DHPREVISTA,CODSIT,COBRAR,RETRABALHO) VALUES 
     ('${numos}',1,'${produto}','${servico}','${uweb}','${cart}',110,GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),15,'N','N')`);
 
