@@ -202,11 +202,11 @@ router.post('/orderserv', isLoggedIn, upload.single('file'), async (req, res) =>
     const produto = req.body.codprod;
     const servico = req.body.codserv;
     const contato = req.body.atualiza;
-    //const slccont = req.body.sla;
     const cart = req.body.carteira;
     const uweb = req.body.usuweb;
-    /* console.log('req.body')
-    console.log(req.body) */
+
+    const t1 = texto
+    const textofin = t1.replace("'", "`");
 
     //verificação cód prioridade sla
     const links2 = await pool.query(`SELECT DISTINCT 
@@ -486,18 +486,8 @@ router.post('/orderserv', isLoggedIn, upload.single('file'), async (req, res) =>
 `);
     const prioridade = 1400
 
-    /* console.log('prioridade')
-    console.log(prioridade)
-
-    console.log('CONTRATO')
-    console.log(contrato)
-
-    console.log('servico')
-    console.log(produto) */
-
-
     await pool.query(`INSERT INTO sankhya.TCSOSE (NUMOS,NUMCONTRATO,DHCHAMADA,DTPREVISTA,CODPARC,CODCONTATO,CODATEND,CODUSURESP,DESCRICAO,SITUACAO,CODCOS,CODCENCUS,CODOAT,POSSUISLA) VALUES 
-    ('${numos}','${contrato}',GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),'${parceiro}','${contato}',110,110,'${texto}','P','',30101,1000000,'S');
+    ('${numos}','${contrato}',GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),'${parceiro}','${contato}',110,110,'${textofin}','P','',30101,1000000,'S');
     INSERT INTO SANKHYA.TCSITE (NUMOS,NUMITEM,CODSERV,CODPROD,CODUSU,CODOCOROS,CODUSUREM,DHENTRADA,DHPREVISTA,CODSIT,COBRAR,RETRABALHO) VALUES 
     ('${numos}',1,'${produto}','${servico}','${uweb}','${cart}',110,GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),15,'N','N')`);
 
@@ -925,19 +915,15 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
         GROUP BY TC.CODUSUREL, U.NOMEUSU, I.NUMOS, U.CODUSU
         ORDER BY U.NOMEUSU`);
 
-    const links3 = await pool.query(`SELECT I.NUMITEM
+    const links3 = await pool.query(`SELECT DISTINCT I.CODOCOROS
     FROM sankhya.TCSOSE O
-        INNER JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)
-        INNER JOIN sankhya.TGFPAR P ON (P.CODPARC=C.CODPARC)
+        INNER JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)        
         INNER JOIN sankhya.TCSITE I ON (O.NUMOS=I.NUMOS)
         INNER JOIN sankhya.AD_ACESSOTEC AC ON (AC.CODUSU = I.CODUSU)
         INNER JOIN sankhya.AD_TBLOGIN L ON (L.CODLOGIN=AC.CODLOGIN)
     WHERE 
-        O.NUFAP IS NULL
-        AND I.TERMEXEC IS NULL
-        --AND I.NUMITEM = (SELECT MAX(NUMITEM) FROM SANKHYA.TCSITE WHERE NUMOS = O.NUMOS AND TERMEXEC IS NULL)
-        AND L.CODLOGIN = ${idlogin}
-        AND I.NUMOS =${numos}`);
+         I.NUMOS =${numos}        
+        AND I.NUMITEM = 1`);
 
     const links4 = await pool.query(`SELECT CD.DESCROCOROS, CD.CODOCOROS
     FROM sankhya.TCSOOS CD
@@ -1004,32 +990,11 @@ router.post('/tecnicos/salvar_os', isLoggedIn, async (req, res) => {
     const horai1 = rm1.replace(":", "");
     const rm2 = horaf
     const horaf1 = rm2.replace(":", "");
-
-    console.log('codusuario')
-    console.log(codusuario)
-    console.log('prioridade')
-    console.log(prioridade)
-    console.log('motivo')
-    console.log(motivo)
-    console.log('statusit')
-    console.log(statusit)
-    console.log('dataex')
-    console.log(tremexec)
-    console.log('horai1')
-    console.log(horai1)
-    console.log('horaf1')
-    console.log(horaf1)
-    console.log('solucao')
-    console.log(solucao)
-    console.log('numos')
-    console.log(numos)
-    console.log('numitem')
-    console.log(numitem)
-
-
+    const t1 = solucao
+    const textofin = t1.replace("'", "`");
 
     pool.query(`UPDATE sankhya.TCSITE
-    SET CODUSU =${codusuario} ,PRIORIDADE =${prioridade} ,SOLUCAO ='${solucao}' ,CODOCOROS=${motivo} ,
+    SET CODUSU =${codusuario} ,PRIORIDADE =${prioridade} ,SOLUCAO ='${textofin}' ,CODOCOROS=${motivo} ,
     CODSIT=${statusit} ,HRINICIAL=${horai1} ,HRFINAL=${horaf1} ,INICEXEC= '${dataex}',TERMEXEC = '${tremexec}'
     WHERE NUMOS =${numos} 
         AND NUMITEM =${numitem}`);
@@ -1063,6 +1028,8 @@ router.post('/tecnicos/encaminhar_os', isLoggedIn, async (req, res) => {
     const horai1 = rm1.replace(":", "");
     const rm2 = horaf
     const horaf1 = rm2.replace(":", "");
+    const t1 = solucao
+    const textofin = t1.replace("'", "`");
 
     //GERA O NOVO ITEM A SER INSERIDO NA OS 
     const item = await pool.query(`select top (1) NUMITEM +1 as NUMOS from sankhya.TCSITE WHERE NUMOS = ${numos} order by numos desc`);
@@ -1073,14 +1040,14 @@ router.post('/tecnicos/encaminhar_os', isLoggedIn, async (req, res) => {
     const tprevisto = Object.values(tempop.recordset[0])
 
     pool.query(`UPDATE sankhya.TCSITE
-    SET CODUSU =${codusuario} ,PRIORIDADE =${prioridade} ,SOLUCAO ='${solucao}' ,CODOCOROS=${motivo} ,
+    SET CODUSU =${codusuario} ,PRIORIDADE =${prioridade} ,SOLUCAO ='${textofin}' ,CODOCOROS=${motivo} ,
     CODSIT=${statusit} ,HRINICIAL=${horai1} ,HRFINAL=${horaf1} ,INICEXEC= '${dataex}',TERMEXEC = '${tremexec}'
     WHERE NUMOS =${numos} 
         AND NUMITEM =${nitem};
 
     INSERT INTO sankhya.TCSITE (NUMOS,NUMITEM, DHPREVISTA, CODUSU,SOLUCAO, CODOCOROS , TEMPPREVISTO,DTALTER,CODUSUALTER,CODUSUREM ,
         DHENTRADA, CODSIT ,DHLIMITESLA,CODSERV,CODPROD)
-        VALUES (${numos}, ${numitem}, '${dataex}', ${codusuario}, '${solucao}', ${motivo}, ${tprevisto}, GETDATE(), ${codusurem}, ${codusurem}, 
+        VALUES (${numos}, ${numitem}, '${dataex}', ${codusuario}, '${textofin}', ${motivo}, ${tprevisto}, GETDATE(), ${codusurem}, ${codusurem}, 
         GETDATE(), ${statusit}, GETDATE(),${codserv}, ${codprod})`);
 
     req.flash('success', 'Ordem De Serviço Encaminhada com Sucesso!!!!')
@@ -1109,10 +1076,12 @@ router.post('/tecnicos/fechar_os', isLoggedIn, async (req, res) => {
     const horai1 = rm1.replace(":", "");
     const rm2 = horaf
     const horaf1 = rm2.replace(":", "");
+    const t1 = solucao
+    const textofin = t1.replace("'", "`");
 
 
     pool.query(`UPDATE sankhya.TCSITE
-    SET CODUSU =${codusuario}, SOLUCAO ='${solucao}', CODOCOROS=${motivo}, CODSIT=${statusit}, HRINICIAL=${horai1},
+    SET CODUSU =${codusuario}, SOLUCAO ='${textofin}', CODOCOROS=${motivo}, CODSIT=${statusit}, HRINICIAL=${horai1},
         HRFINAL=${horaf1}, INICEXEC= GETDATE(), TERMEXEC = GETDATE()
     WHERE NUMOS =${numos} AND NUMITEM =${numitem};
     
@@ -1127,8 +1096,6 @@ router.post('/tecnicos/fechar_os', isLoggedIn, async (req, res) => {
 //update
 //ADICIONAR CONTRATOS AOS NOVOS USUÁRIOS, SOMENTE ADMIN
 router.get('/password', isLoggedIn, async (req, res) => {
-
-
     res.render('links/passwords')
 });
 
@@ -1137,13 +1104,6 @@ router.get('/password', isLoggedIn, async (req, res) => {
 router.post('/password', isLoggedIn, async (req, res) => {
     const idlogin = req.user.CODLOGIN
     const contrato = req.body.contrato;
-
-    /* console.log('contrato')
-    console.log(contrato)
-
-    console.log('login')
-    console.log(idlogin) */
-
     pool.query(`UPDATE sankhya.AD_TBLOGIN
             SET SENHA = '${contrato}'
             WHERE CODLOGIN = '${idlogin}'`);
@@ -1151,7 +1111,5 @@ router.post('/password', isLoggedIn, async (req, res) => {
     req.flash('success', 'Senha atualizada com Sucesso!!!!')
     res.redirect('/links/tecnicos/abertas')
 });
-
-
 
 module.exports = router;
