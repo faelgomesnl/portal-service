@@ -94,44 +94,47 @@ router.get('/orderserv', isLoggedIn, async (req, res) => {
     const idlogin = req.user.CODLOGIN
 
     //contrato
-    const links = await pool.query(`SELECT  L.NUM_CONTRATO, 
-    CASE WHEN CON.AD_LOCALIDADE IS NULL THEN PAR.NOMEPARC
-ELSE CON.AD_LOCALIDADE END AS NOMEPARC,
-    PAR.CODPARC,  CON.CODUSUOS , L.ID_LOGIN,
-    CON.AD_CIRCUITO,
-    CD.NOMECID AS CIDADE,
-    (CONVERT(VARCHAR(45),EN.NOMEEND,103)) as LOGRADOURO,
-    CASE
-         WHEN CON.AD_CODOCOROS IS NULL THEN 900
-         ELSE CON.AD_CODOCOROS
-       END AS CARTEIRA
+    const links = await pool.query(`SELECT L.NUM_CONTRATO, L.ID_LOGIN AS LOGADO, SLA.CODCARGAHOR,
+        CASE WHEN (CON.AD_LOCALIDADE IS NULL OR CON.AD_LOCALIDADE = '') THEN PAR.NOMEPARC
+    ELSE CON.AD_LOCALIDADE END AS NOMEPARC,
+        CASE WHEN (CON.CODPARCSEC IS NULL OR CON.CODPARCSEC = 0) THEN PAR.CODPARC
+    ELSE CON.CODPARCSEC END AS CODPARC,
+        CON.CODUSUOS , L.ID_LOGIN,
+        CON.AD_CIRCUITO,
+        CD.NOMECID AS CIDADE,
+        (CONVERT(VARCHAR(45),EN.NOMEEND,103)) as LOGRADOURO,
+        CASE
+            WHEN CON.AD_CODOCOROS IS NULL THEN 900
+            ELSE CON.AD_CODOCOROS
+        END AS CARTEIRA
     FROM sankhya.AD_TBACESSO L
-    INNER JOIN sankhya.TCSCON CON ON (L.NUM_CONTRATO = CON.NUMCONTRATO)
-    INNER JOIN sankhya.TGFPAR PAR ON (PAR.CODPARC = CON.CODPARC) 
-    INNER JOIN sankhya.TCSPSC PS ON (CON.NUMCONTRATO=PS.NUMCONTRATO)
-    INNER JOIN sankhya.TGFPRO PD ON (PD.CODPROD=PS.CODPROD)
-    INNER JOIN sankhya.TGFCTT C ON (PAR.CODPARC=C.CODPARC)
-    LEFT JOIN sankhya.TCSSLA SLA ON (SLA.NUSLA = CON.NUSLA)
-    LEFT JOIN sankhya.TCSRSL TC ON (SLA.NUSLA=TC.NUSLA)
-    LEFT JOIN sankhya.TSIBAI BR ON (PAR.CODBAI=BR.CODBAI)
-    LEFT JOIN sankhya.TSICID CD ON (CD.CODCID=PAR.CODCID)
-    LEFT JOIN sankhya.TSIEND EN ON (EN.CODEND=PAR.CODEND)
-    LEFT JOIN sankhya.TSIUFS UF ON (UF.UF=CD.UF)
-    LEFT JOIN sankhya.TFPLGR LG ON (LG.CODLOGRADOURO=EN.CODLOGRADOURO)
+        INNER JOIN sankhya.TCSCON CON ON (L.NUM_CONTRATO = CON.NUMCONTRATO)
+        INNER JOIN sankhya.TGFPAR PAR ON (PAR.CODPARC = CON.CODPARC)
+        INNER JOIN sankhya.TCSPSC PS ON (CON.NUMCONTRATO=PS.NUMCONTRATO)
+        INNER JOIN sankhya.TGFPRO PD ON (PD.CODPROD=PS.CODPROD)
+        INNER JOIN sankhya.TGFCTT C ON (PAR.CODPARC=C.CODPARC)
+        LEFT JOIN sankhya.TCSSLA SLA ON (SLA.NUSLA = CON.NUSLA)
+        LEFT JOIN sankhya.TCSRSL TC ON (SLA.NUSLA=TC.NUSLA)
+        LEFT JOIN sankhya.TSIBAI BR ON (PAR.CODBAI=BR.CODBAI)
+        LEFT JOIN sankhya.TSICID CD ON (CD.CODCID=PAR.CODCID)
+        LEFT JOIN sankhya.TSIEND EN ON (EN.CODEND=PAR.CODEND)
+        LEFT JOIN sankhya.TSIUFS UF ON (UF.UF=CD.UF)
+        LEFT JOIN sankhya.TFPLGR LG ON (LG.CODLOGRADOURO=EN.CODLOGRADOURO)
     WHERE L.ID_LOGIN = ${idlogin}
-    AND CON.ATIVO = 'S'
-    AND PS.SITPROD IN ('A','B')
-    AND PD.USOPROD IN ('S', 'R')
-    AND TC.PRIORIDADE IS NULL
+        AND CON.ATIVO = 'S'
+        AND PS.SITPROD IN ('A','B')
+        AND PD.USOPROD IN ('S', 'R')
+        AND TC.PRIORIDADE IS NULL
     GROUP BY CON.AD_LOCALIDADE, L.NUM_CONTRATO,PAR.NOMEPARC,PAR.CODPARC,  CON.CODUSUOS , L.ID_LOGIN,    
-    CON.AD_CIRCUITO,    CD.NOMECID, CON.AD_CODOCOROS,EN.NOMEEND
+        CON.AD_CIRCUITO,    CD.NOMECID, CON.AD_CODOCOROS,EN.NOMEEND,SLA.CODCARGAHOR, CON.CODPARCSEC
     ORDER BY CON.AD_LOCALIDADE`);
 
     //contatos
     const links2 = await pool.query(`SELECT DISTINCT 
     UPPER  (CONVERT(VARCHAR(30),c.NOMECONTATO,103))+' - '+CONVERT(VARCHAR(30),con.NUMCONTRATO,103)+' -'+
     CONVERT(VARCHAR(30),c.CODCONTATO,103) as CONTATO,
-    c.CODCONTATO AS CODCONT,
+    CASE WHEN CON.CODPARCSEC IS NULL THEN c.CODCONTATO
+    ELSE 1 END AS CODCONT,
     UPPER  (CONVERT(VARCHAR(30),c.NOMECONTATO,103)) as NOME
     from sankhya.TGFPAR P
     INNER JOIN sankhya.TGFCTT C ON (P.CODPARC=C.CODPARC)
@@ -195,6 +198,7 @@ router.post('/orderserv', isLoggedIn, upload.single('file'), async (req, res) =>
     const links = await pool.query('select top (1) NUMOS +1 as NUMOS from sankhya.TCSOSE order by numos desc');
     const numos = Object.values(links.recordset[0])
 
+    const idlogin = req.user.CODLOGIN
     const texto = req.body.texto;
     const filetoupload = upload
     const contrato = req.body.contrato;
@@ -204,6 +208,9 @@ router.post('/orderserv', isLoggedIn, upload.single('file'), async (req, res) =>
     const contato = req.body.atualiza;
     const cart = req.body.carteira;
     const uweb = req.body.usuweb;
+    const cghora = req.body.cargahora;
+    const adloc = req.body.adlocalidade;
+    const userlog = req.body.loginuser;
 
     const t1 = texto
     const textofin = t1.replace("'", "`");
@@ -477,23 +484,32 @@ router.post('/orderserv', isLoggedIn, upload.single('file'), async (req, res) =>
     LEFT JOIN sankhya.TCSRSL TC ON (SLA.NUSLA=TC.NUSLA)
     LEFT JOIN sankhya.TFPCGH TH ON (TH.CODCARGAHOR=SLA.CODCARGAHOR)  
     LEFT JOIN sankhya.TFPHOR CH ON (TH.CODCARGAHOR=CH.CODCARGAHOR)     
-    WHERE CON.NUMCONTRATO='${contrato}'   
-    AND (TC.CODSERV = '${produto}' OR TC.CODSERV IS NULL)
-    AND CON.ATIVO = 'S'
-    AND TC.PADRAO = (CASE WHEN CON.AD_CIRCUITO IS NOT NULL THEN 'N' ELSE 'S' END)
-    AND CH.ENTRADA IS NOT NULL
-    AND CH.SAIDA IS NOT NULL
-`);
-    const prioridade = 1400
+    WHERE CON.NUMCONTRATO='${contrato}'
+    AND CON.ATIVO = 'S'    
+    AND PRIORIDADE =1`);
 
-    await pool.query(`INSERT INTO sankhya.TCSOSE (NUMOS,NUMCONTRATO,DHCHAMADA,DTPREVISTA,CODPARC,CODCONTATO,CODATEND,CODUSURESP,DESCRICAO,SITUACAO,CODCOS,CODCENCUS,CODOAT,POSSUISLA) VALUES 
-    ('${numos}','${contrato}',GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),'${parceiro}','${contato}',110,110,'${textofin}','P','',30101,1000000,'S');
+    var pfinal, locfinal;
+
+    if (adloc != '' && adloc != 0) {
+        locfinal = 1
+    } else {
+        locfinal = contato
+    }
+
+    if (cghora === '') {
+        pfinal = 1400
+    } else {
+        pfinal = Object.values(links2.recordset[0])
+    }
+
+    await pool.query(`INSERT INTO sankhya.TCSOSE (NUMOS,NUMCONTRATO,DHCHAMADA,DTPREVISTA,CODPARC,CODCONTATO,CODATEND,CODUSURESP,DESCRICAO,SITUACAO,CODCOS,CODCENCUS,CODOAT,AD_LOGIN,POSSUISLA) VALUES 
+    ('${numos}','${contrato}',GETDATE(),(SELECT DATEADD(MI,${pfinal},GETDATE())),'${parceiro}','${locfinal}',110,110,'${textofin}','P','',30101,1000000,'${userlog}','S');
     INSERT INTO SANKHYA.TCSITE (NUMOS,NUMITEM,CODSERV,CODPROD,CODUSU,CODOCOROS,CODUSUREM,DHENTRADA,DHPREVISTA,CODSIT,COBRAR,RETRABALHO) VALUES 
-    ('${numos}',1,'${produto}','${servico}','${uweb}','${cart}',110,GETDATE(),(SELECT DATEADD(MI,${prioridade},GETDATE())),15,'N','N')`);
+    ('${numos}',1,'${produto}','${servico}','${uweb}','${cart}',110,GETDATE(),(SELECT DATEADD(MI,${pfinal},GETDATE())),15,'N','N');
+    UPDATE sankhya.AD_TBLOGIN SET ULTIMO_ACESSO = GETDATE() WHERE CODLOGIN =${idlogin}`);
 
     req.flash('success', 'Ordem De Serviço Criada com Sucesso!!!! Nº: ', numos)
     res.redirect('/links')
-
 });
 
 //PAGINAS DATATABLES
@@ -502,7 +518,9 @@ router.get('/', isLoggedIn, async (req, res) => {
     const idlogin = req.user.CODLOGIN
     const links = await pool.query(`SELECT 
     C.NUMCONTRATO, 
-    P.NOMEPARC,    
+    P.NOMEPARC, 
+    CASE WHEN C.AD_LOCALIDADE IS NULL THEN P.NOMEPARC ELSE C.AD_LOCALIDADE END AS AD_LOCALIDADE,
+    --C.AD_LOCALIDADE,   
     O.NUMOS, 
     I.NUMITEM,
     USU.NOMEUSU AS EXECUTANTE,
@@ -550,7 +568,8 @@ router.get('/osclose', isLoggedIn, async (req, res) => {
     const idlogin = req.user.CODLOGIN
     const links = await pool.query(`SELECT 
     C.NUMCONTRATO, 
-    P.NOMEPARC,    
+    CASE WHEN C.AD_LOCALIDADE IS NULL THEN P.NOMEPARC ELSE C.AD_LOCALIDADE END AS AD_LOCALIDADE,
+    --C.AD_LOCALIDADE,     
     O.NUMOS, 
     I.NUMITEM,
     CONVERT(VARCHAR(10), I.TERMEXEC, 120)  AS ABERTURA2,
@@ -601,7 +620,8 @@ router.get('/all', isLoggedIn, async (req, res) => {
     const idlogin = req.user.CODLOGIN
     const links = await pool.query(`SELECT 
     C.NUMCONTRATO, 
-    P.NOMEPARC,    
+    CASE WHEN C.AD_LOCALIDADE IS NULL THEN P.NOMEPARC ELSE C.AD_LOCALIDADE END AS AD_LOCALIDADE,
+    --C.AD_LOCALIDADE,     
     O.NUMOS,
     (CASE O.SITUACAO WHEN 'F' THEN 'Fechada'ELSE 'Aberta' END) AS SITUACAO, 
     I.NUMITEM,
@@ -772,7 +792,7 @@ router.get('/tecnicos/abertas', isLoggedIn, async (req, res) => {
     const idlogin = req.user.CODLOGIN
     const links = await pool.query(`SELECT 
     C.NUMCONTRATO, 
-    P.NOMEPARC,    
+    CASE WHEN O.NUFAP IS NULL THEN P.NOMEPARC ELSE P1.NOMEPARC END AS NOMEPARC,
     O.NUMOS, 
     I.NUMITEM,
     USU.NOMEUSU AS EXECUTANTE,
@@ -789,8 +809,10 @@ router.get('/tecnicos/abertas', isLoggedIn, async (req, res) => {
     ITS.DESCRICAO
 
     FROM sankhya.TCSOSE O
-    INNER JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)
-    INNER JOIN sankhya.TGFPAR P ON (P.CODPARC=C.CODPARC)
+    LEFT JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)
+    LEFT JOIN sankhya.TGFPAR P ON (P.CODPARC=C.CODPARC)
+    LEFT JOIN sankhya.TGFCAB CB ON (O.NUNOTA=CB.NUNOTA)
+    LEFT JOIN sankhya.TGFPAR P1 ON (CB.CODPARC=P1.CODPARC)
     INNER JOIN sankhya.TCSITE I ON (O.NUMOS=I.NUMOS)
     INNER JOIN sankhya.AD_ACESSOTEC AC ON (AC.CODUSU = I.CODUSU)
     INNER JOIN sankhya.AD_TBLOGIN L ON (L.CODLOGIN=AC.CODLOGIN)
@@ -803,8 +825,7 @@ router.get('/tecnicos/abertas', isLoggedIn, async (req, res) => {
     LEFT JOIN sankhya.TCSSLA SLA ON (SLA.NUSLA = C.NUSLA)
 
     WHERE 
-    O.NUFAP IS NULL
-    AND I.TERMEXEC IS NULL
+   I.TERMEXEC IS NULL
     --AND I.NUMITEM = (SELECT MAX(NUMITEM) FROM SANKHYA.TCSITE WHERE NUMOS = O.NUMOS AND TERMEXEC IS NULL)   
     AND L.CODLOGIN= ${idlogin}`);
     res.render('links/tecnicos/abertas', {
@@ -871,17 +892,18 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
     const numos = params
 
     //OS SELECIONADA TÉCNICO PARA SALVAR 
-    const links = await pool.query(`SELECT O.NUMOS,I.NUMITEM, CONVERT(NVARCHAR(MAX),O.DESCRICAO)AS DEFEITO, 
-    I.CODPROD,I.CODSERV, AC.CODUSU AS CODUSUREM, CONVERT(NVARCHAR(MAX),I.SOLUCAO) AS SOLUCAO
-    FROM sankhya.TCSOSE O
-        INNER JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)
-        INNER JOIN sankhya.TGFPAR P ON (P.CODPARC=C.CODPARC)
-        INNER JOIN sankhya.TCSITE I ON (O.NUMOS=I.NUMOS)
-        INNER JOIN sankhya.AD_ACESSOTEC AC ON (AC.CODUSU = I.CODUSU)
-        INNER JOIN sankhya.AD_TBLOGIN L ON (L.CODLOGIN=AC.CODLOGIN)
-    WHERE 
-        O.NUFAP IS NULL
-        AND I.TERMEXEC IS NULL
+    const links = await pool.query(`SELECT O.NUMOS, I.NUMITEM, CONVERT(NVARCHAR(MAX),O.DESCRICAO)AS DEFEITO,
+    I.CODPROD, I.CODSERV, AC.CODUSU AS CODUSUREM, CONVERT(NVARCHAR(MAX),I.SOLUCAO) AS SOLUCAO
+FROM sankhya.TCSOSE O
+    LEFT JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)
+    LEFT JOIN sankhya.TGFPAR P ON (P.CODPARC=C.CODPARC)
+    LEFT JOIN sankhya.TGFCAB CB ON (O.NUNOTA=CB.NUNOTA)
+    LEFT JOIN sankhya.TGFPAR P1 ON (CB.CODPARC=P1.CODPARC)
+    INNER JOIN sankhya.TCSITE I ON (O.NUMOS=I.NUMOS)
+    INNER JOIN sankhya.AD_ACESSOTEC AC ON (AC.CODUSU = I.CODUSU)
+    INNER JOIN sankhya.AD_TBLOGIN L ON (L.CODLOGIN=AC.CODLOGIN)
+WHERE    
+    I.TERMEXEC IS NULL
         AND L.CODLOGIN = ${idlogin}
         AND I.NUMOS =${numos}
     GROUP BY O.NUMOS,I.NUMITEM,CONVERT(NVARCHAR(MAX),O.DESCRICAO),I.CODPROD,I.CODSERV,AC.CODUSU,CONVERT(NVARCHAR(MAX),I.SOLUCAO)`);
@@ -917,7 +939,7 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
 
     const links3 = await pool.query(`SELECT DISTINCT I.CODOCOROS
     FROM sankhya.TCSOSE O
-        INNER JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)        
+        LEFT JOIN sankhya.TCSCON C ON (C.NUMCONTRATO=O.NUMCONTRATO)        
         INNER JOIN sankhya.TCSITE I ON (O.NUMOS=I.NUMOS)
         INNER JOIN sankhya.AD_ACESSOTEC AC ON (AC.CODUSU = I.CODUSU)
         INNER JOIN sankhya.AD_TBLOGIN L ON (L.CODLOGIN=AC.CODLOGIN)
@@ -927,10 +949,9 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
 
     const links4 = await pool.query(`SELECT CD.DESCROCOROS, CD.CODOCOROS
     FROM sankhya.TCSOOS CD
-    INNER JOIN sankhya.TCSSEM E ON (CD.CODOCOROS=E.CODOCOROS)
-    INNER JOIN sankhya.TCSITE I ON (I.CODOCOROS=CD.CODOCOROS)
-    WHERE E.CODPROD = (SELECT DISTINCT CODSERV
-    FROM  sankhya.TCSITE
+        INNER JOIN sankhya.TCSITE I ON (I.CODOCOROS=CD.CODOCOROS)
+    WHERE I.CODSERV = (SELECT DISTINCT CODSERV
+    FROM sankhya.TCSITE
     WHERE NUMOS = ${numos} AND NUMITEM =1)
     GROUP BY CD.DESCROCOROS, CD.CODOCOROS
     ORDER BY DESCROCOROS`);
@@ -956,8 +977,6 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
         AND I.NUMOS =${numos} 
         AND I.NUMITEM <> (SELECT MAX(NUMITEM) FROM sankhya.TCSITE WHERE NUMOS = ${numos} )`);
 
-    pool.query(`UPDATE sankhya.AD_TBLOGIN SET ULTIMO_ACESSO = GETDATE() WHERE CODLOGIN= ${idlogin}`);
-
     res.render('links/tecnicos/salvar_os', {
         geral: links.recordset,
         cont: links2.recordset,
@@ -970,6 +989,7 @@ router.get('/tecnicos/salvar_os/:texto?', isLoggedIn, async (req, res) => {
 
 router.post('/tecnicos/salvar_os', isLoggedIn, async (req, res) => {
 
+    const idlogin = req.user.CODLOGIN
     const codusuario = req.body.value;
     const prioridade = req.body.prioridade;
     const motivo = req.body.motivo;
@@ -996,8 +1016,9 @@ router.post('/tecnicos/salvar_os', isLoggedIn, async (req, res) => {
     pool.query(`UPDATE sankhya.TCSITE
     SET CODUSU =${codusuario} ,PRIORIDADE =${prioridade} ,SOLUCAO ='${textofin}' ,CODOCOROS=${motivo} ,
     CODSIT=${statusit} ,HRINICIAL=${horai1} ,HRFINAL=${horaf1} ,INICEXEC= '${dataex}',TERMEXEC = '${tremexec}'
-    WHERE NUMOS =${numos} 
-        AND NUMITEM =${numitem}`);
+    WHERE NUMOS =${numos} AND NUMITEM =${numitem};
+    
+    UPDATE sankhya.AD_TBLOGIN SET ULTIMO_ACESSO = GETDATE() WHERE CODLOGIN =${idlogin}`);
 
     req.flash('success', 'Ordem De Serviço Salva com Sucesso!!!!')
     res.redirect('/links/tecnicos/abertas')
@@ -1005,6 +1026,7 @@ router.post('/tecnicos/salvar_os', isLoggedIn, async (req, res) => {
 
 router.post('/tecnicos/encaminhar_os', isLoggedIn, async (req, res) => {
 
+    const idlogin = req.user.CODLOGIN
     const codusuario = req.body.value;
     const motivo = req.body.motivo;
     const prioridade = req.body.prioridade;
@@ -1048,7 +1070,9 @@ router.post('/tecnicos/encaminhar_os', isLoggedIn, async (req, res) => {
     INSERT INTO sankhya.TCSITE (NUMOS,NUMITEM, DHPREVISTA, CODUSU,SOLUCAO, CODOCOROS , TEMPPREVISTO,DTALTER,CODUSUALTER,CODUSUREM ,
         DHENTRADA, CODSIT ,DHLIMITESLA,CODSERV,CODPROD)
         VALUES (${numos}, ${numitem}, '${dataex}', ${codusuario}, '${textofin}', ${motivo}, ${tprevisto}, GETDATE(), ${codusurem}, ${codusurem}, 
-        GETDATE(), ${statusit}, GETDATE(),${codserv}, ${codprod})`);
+        GETDATE(), ${statusit}, GETDATE(),${codserv}, ${codprod});
+    
+    UPDATE sankhya.AD_TBLOGIN SET ULTIMO_ACESSO = GETDATE() WHERE CODLOGIN =${idlogin}`);
 
     req.flash('success', 'Ordem De Serviço Encaminhada com Sucesso!!!!')
     res.redirect('/links/tecnicos/abertas')
@@ -1056,6 +1080,7 @@ router.post('/tecnicos/encaminhar_os', isLoggedIn, async (req, res) => {
 
 router.post('/tecnicos/fechar_os', isLoggedIn, async (req, res) => {
 
+    const idlogin = req.user.CODLOGIN
     const codusuario = req.body.value;
     const prioridade = req.body.prioridade;
     const motivo = req.body.motivo;
@@ -1087,7 +1112,9 @@ router.post('/tecnicos/fechar_os', isLoggedIn, async (req, res) => {
     
     UPDATE SANKHYA.TCSOSE 
     SET SITUACAO = 'F', DTFECHAMENTO = GETDATE(), CODUSUFECH = ${codusuario}, DHFECHAMENTOSLA = GETDATE()
-    WHERE NUMOS =${numos}`);
+    WHERE NUMOS =${numos};
+    
+    UPDATE sankhya.AD_TBLOGIN SET ULTIMO_ACESSO = GETDATE() WHERE CODLOGIN =${idlogin}`);
 
     req.flash('success', 'Ordem De Serviço Finalizada com Sucesso!!!!')
     res.redirect('/links/tecnicos/abertas')

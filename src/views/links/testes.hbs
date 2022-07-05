@@ -22,7 +22,8 @@
                                 {{#each geral}}
                                 <option value="{{NUM_CONTRATO}}" id="{{CODPARC}}" title="{{CODPROD}}"
                                     ren="{{VALORTEMPO}}" ren2="{{CIDADE}}" ren3="{{LOGRADOURO}}" ren4="{{NOMEPARC}}"
-                                    ren5="{{CARTEIRA}}" ren6="{{CODUSUOS}}">
+                                    ren5="{{CARTEIRA}}" ren6="{{CODUSUOS}}" ren7="{{CODCARGAHOR}}" ren8="{{CODPARCSEC}}"
+                                    ren9="{{ID_LOGIN}}">
                                     {{AD_CIRCUITO}}
                                 </option>
                                 {{/each}}
@@ -91,6 +92,9 @@
                             <input hidden id="sla" name="sla" required>
                             <input hidden id="carteira" name="carteira" required>
                             <input hidden id="usuweb" name="usuweb" required>
+                            <input hidden id="cargahora" name="cargahora">
+                            <input hidden id="adlocalidade" name="adlocalidade">
+                            <input hidden id="loginuser" name="loginuser">
 
                             {{!-- exibição enderaço --}}
                             <input hidden type="text" id="cidade" name="cidade" disabled="disabled" style='width:100%'>
@@ -128,8 +132,8 @@
 
                         <div class="form-group">
                             <textarea type="text" name="texto" class="form-control">Nome:
-Setor:   ||
-Ramal:   ||
+Setor:   
+Ramal:   
 Descrição Do Problema:</textarea>
                         </div>
 
@@ -141,7 +145,8 @@ Descrição Do Problema:</textarea>
                                 {{#each geral}}
                                 <option value="{{NUM_CONTRATO}}" id="{{CODPARC}}" title="{{CODPROD}}"
                                     ren="{{VALORTEMPO}}" ren2="{{CIDADE}}" ren3="{{LOGRADOURO}}" ren4="{{NOMEPARC}}"
-                                    ren5="{{CARTEIRA}}" ren6="{{CODUSUOS}}">
+                                    ren5="{{CARTEIRA}}" ren6="{{CODUSUOS}}" ren7="{{CODCARGAHOR}}" ren8="{{CODPARCSEC}}"
+                                    ren9="{{ID_LOGIN}}">
                                     {{NOMEPARC}}
                                 </option>
                                 {{/each}}
@@ -210,7 +215,9 @@ Descrição Do Problema:</textarea>
                             <input hidden id="sla" name="sla">
                             <input hidden id="carteira" name="carteira" required>
                             <input hidden id="usuweb" name="usuweb" required>
-
+                            <input hidden id="cargahora" name="cargahora">
+                            <input hidden id="adlocalidade" name="adlocalidade">
+                            <input hidden id="loginuser" name="loginuser">
                             {{!-- exibição enderaço --}}
                             <input hidden type="text" id="cidade" name="cidade" disabled="disabled" style='width:100%'>
                             <input hidden type="text" id="logradouro" name="logradouro" disabled="disabled"
@@ -243,7 +250,7 @@ Descrição Do Problema:</textarea>
 
 
                         <div class="form-group">
-                            <textarea type="text" name="texto" class="form-control"></textarea>
+                            <textarea type="text" name="texto" class="form-control" required></textarea>
                         </div>
 
                         <div class="form-group">
@@ -254,7 +261,8 @@ Descrição Do Problema:</textarea>
                                 {{#each geral}}
                                 <option value="{{NUM_CONTRATO}}" id="{{CODPARC}}" title="{{CODPROD}}"
                                     ren="{{VALORTEMPO}}" ren2="{{CIDADE}}" ren3="{{LOGRADOURO}}" ren4="{{NOMEPARC}}"
-                                    ren5="{{CARTEIRA}}" ren6="{{CODUSUOS}}">
+                                    ren5="{{CARTEIRA}}" ren6="{{CODUSUOS}}" ren7="{{CODCARGAHOR}}" ren8="{{CODPARCSEC}}"
+                                    ren9="{{ID_LOGIN}}">
                                     {{NOMEPARC}}
                                 </option>
                                 {{/each}}
@@ -323,6 +331,9 @@ Descrição Do Problema:</textarea>
                             <input hidden id="sla" name="sla">
                             <input hidden id="carteira" name="carteira" required>
                             <input hidden id="usuweb" name="usuweb" required>
+                            <input hidden id="cargahora" name="cargahora">
+                            <input hidden id="adlocalidade" name="adlocalidade">
+                            <input hidden id="loginuser" name="loginuser">
 
                             {{!-- exibição enderaço --}}
                             <input hidden type="text" id="cidade" name="cidade" disabled="disabled" style='width:100%'>
@@ -374,8 +385,6 @@ Descrição Do Problema:</textarea>
         //busca valor contrato
         var contrato = option.value;
         var contr = contrato.toString();
-        //console.log('valor contrato')
-        //console.log(contr)   
 
         document.getElementById('value').value = option.value;
         document.getElementById('codparc').value = option.id;
@@ -386,10 +395,16 @@ Descrição Do Problema:</textarea>
         var ren = document.forms['frm_'].elements['list'].options[document.forms['frm_'].elements['list'].selectedIndex].getAttribute('ren');
         var ren5 = document.forms['frm_'].elements['list'].options[document.forms['frm_'].elements['list'].selectedIndex].getAttribute('ren5');
         var ren6 = document.forms['frm_'].elements['list'].options[document.forms['frm_'].elements['list'].selectedIndex].getAttribute('ren6');
+        var ren7 = document.forms['frm_'].elements['list'].options[document.forms['frm_'].elements['list'].selectedIndex].getAttribute('ren7');
+        var ren8 = document.forms['frm_'].elements['list'].options[document.forms['frm_'].elements['list'].selectedIndex].getAttribute('ren8');
+        var ren9 = document.forms['frm_'].elements['list'].options[document.forms['frm_'].elements['list'].selectedIndex].getAttribute('ren9');
 
         document.getElementById('sla').value = ren
         document.getElementById('carteira').value = ren5
         document.getElementById('usuweb').value = ren6
+        document.getElementById('cargahora').value = ren7
+        document.getElementById('adlocalidade').value = ren8
+        document.getElementById('loginuser').value = ren9
 
         //lista endereço da localidade escolhida
         var ren2 = document.forms['frm_'].elements['list'].options[document.forms['frm_'].elements['list'].selectedIndex].getAttribute('ren2');
@@ -405,14 +420,7 @@ Descrição Do Problema:</textarea>
         var select = document.getElementById('list2');
         var option = select.options[select.selectedIndex];
         var contatos = option.value
-
-        //console.log('select contatos')
-        //console.log(contatos) 
-
         const languagesList = contatos
-
-        //console.log('impressao lista contatos languagesList')
-        //console.log(languagesList) 
 
         //pega o select referente ao contato
         var select = document.getElementById("list2");
@@ -432,12 +440,9 @@ Descrição Do Problema:</textarea>
         }
 
         //le os dados que foram armazenados e insere na lista
-        //console.log("Lista Preenchida")
         for (k = 0; k < vlroption.length; k = k + 1) {
-            //console.log(vlroption[k])
-            if (vlroption[k].match(contr)) {
-                //console.log(vlroption[k])
 
+            if (vlroption[k].match(contr)) {
                 //insere os itens no select option
                 var option = new Option(vlroption[k], vlroption[k]);
                 var select = document.getElementById("aqui");
@@ -465,7 +470,6 @@ Descrição Do Problema:</textarea>
         // console.log("Lista Preenchida")
         for (k = 0; k < vlroption.length; k = k + 1) {
             if (vlroption[k].match(contr)) {
-                //console.log(vlroption[k])
 
                 //insere os itens no select option
                 var option = new Option(vlroption[k], vlroption[k]);
@@ -473,7 +477,6 @@ Descrição Do Problema:</textarea>
                 select.add(option);
             }
         }
-
 
         //pega o select referente ao serviço
         var select = document.getElementById("list4");
@@ -495,7 +498,6 @@ Descrição Do Problema:</textarea>
         //console.log("Lista Preenchida")
         for (k = 0; k < vlroption.length; k = k + 1) {
             if (vlroption[k].match(contr)) {
-                //console.log(vlroption[k])
 
                 //insere os itens no select option
                 var option = new Option(vlroption[k], vlroption[k]);

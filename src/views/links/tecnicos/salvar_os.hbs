@@ -101,18 +101,18 @@
 
                             <div class="form-group">
                                 {{!-- DADOS ENVIADOS PARA O POST (SALVAR, ENCAMINHAR E FECHAR OS's) --}}
-                                <input  id="value" name="value" required>
-                                <input  id="prioridade" name="prioridade" value="NULL">
-                                <input  id="motivo" name="motivo" value={{#each item}}{{CODOCOROS}}{{/each}}>
-                                <input  id="statusi" name="statusi" required>
-                                <input  id="numos" name="numos">
-                                <input  id="numitem" name="numitem" value={{#each geral}}{{NUMITEM}}{{/each}}>
-                                <input  id="fechar" name="fechar" value={{#each fechar}}{{ABERTAS}}{{/each}}>
+                                <input hidden id="value" name="value" required>
+                                <input hidden id="prioridade" name="prioridade" value="NULL">
+                                <input hidden id="motivo" name="motivo" value={{#each item}}{{CODOCOROS}}{{/each}}>
+                                <input hidden id="statusi" name="statusi" required>
+                                <input hidden id="numos" name="numos">
+                                <input hidden id="numitem" name="numitem" value={{#each geral}}{{NUMITEM}}{{/each}}>
+                                <input hidden id="fechar" name="fechar" value={{#each fechar}}{{ABERTAS}}{{/each}}>
 
                                 {{!-- ENCAINHAR OS --}}
-                                <input  id="codprod" name="codprod" value={{#each geral}}{{CODPROD}}{{/each}}>
-                                <input  id="codserv" name="codserv" value={{#each geral}}{{CODSERV}}{{/each}}>
-                                <input  id="codusurem" name="codusurem" value={{#each
+                                <input hidden id="codprod" name="codprod" value={{#each geral}}{{CODPROD}}{{/each}}>
+                                <input hidden id="codserv" name="codserv" value={{#each geral}}{{CODSERV}}{{/each}}>
+                                <input hidden id="codusurem" name="codusurem" value={{#each
                                     geral}}{{CODUSUREM}}{{/each}}>
 
                             </div>
