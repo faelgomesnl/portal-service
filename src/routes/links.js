@@ -774,7 +774,6 @@ router.get('/tecnicos/vincular', isLoggedIn, async (req, res) => {
     })
 });
 
-
 router.post('/tecnicos/vincular', isLoggedIn, async (req, res) => {
 
     const codusuario = req.body.numcontrat;
