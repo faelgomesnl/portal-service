@@ -19,19 +19,11 @@
 
 <body>
     <center>
-        <font size='6'>Lista OS Abertas</font>
+        <font size='6'>Contratos {{#each nome}}{{NOMEUSU}} {{/each}}</font>
     </center>
 
 
     <div class="container">
-
-        <form action="" method="get" id="frm_" name="frm_" enctype="multipart/form-data">
-            <button id="visualizarDados" data-toggle="tooltip" data-placement="bottom" title="Salvar">Visualizar Contratos
-            </button>
-
-            <input hidden id="salvar" name="salvar">
-
-        </form>
 
         <div class="row">
             <div class="col-sm">
@@ -39,19 +31,15 @@
                     <thead>
                         <tr>
                             <th data-field="cod" data-editable="true"></th>
-                            <th data-field="cod" data-editable="true">Cód. Usuário</th>
-                            <th data-field="usuario" data-editable="true">Usuário</th>
-                            <th data-field="login" data-editable="true">Login</th>
+                            <th data-field="cod" data-editable="true">Contratos</th>
 
                         </tr>
                     </thead>
                     <tbody>
-                        {{#each lista}}
+                        {{#each geral}}
                         <tr>
                             <td></td>
-                            <td>{{CODLOGIN}}</td>
-                            <td>{{fullname}}</td>
-                            <td>{{NOMEUSU}}</td>
+                            <td>{{NUM_CONTRATO}}</td>                            
 
                         </tr>
                         {{/each}}
@@ -168,64 +156,6 @@
         });
 
         //fim da função
-
-        //selecionar item para imprimir nota 
-        var tabela = document.getElementById("table");
-        var linhas = tabela.getElementsByTagName("tr");
-
-        for (var i = 0; i < linhas.length; i++) {
-            var linha = linhas[i];
-            linha.addEventListener("click", function () {
-                //Adicionar ao atual
-                selLinha(this, false); //Selecione apenas um
-                //selLinha(this, true); //Selecione quantos quiser
-            });
-        }
-
-        /**
-        Caso passe true, você pode selecionar multiplas linhas.
-        Caso passe false, você só pode selecionar uma linha por vez.
-        **/
-        function selLinha(linha, multiplos) {
-            if (!multiplos) {
-                var linhas = linha.parentElement.getElementsByTagName("tr");
-                for (var i = 0; i < linhas.length; i++) {
-                    var linha_ = linhas[i];
-                    linha_.classList.remove("selecionado");
-                }
-            }
-            linha.classList.toggle("selecionado");
-        }
-
-        /**
-        Exemplo de como capturar os dados
-        **/
-        var btnVisualizar = document.getElementById("visualizarDados");
-
-        btnVisualizar.addEventListener("click", function () {
-            var selecionados = tabela.getElementsByClassName("selecionado");
-            //Verificar se eestá selecionado
-            if (selecionados.length < 1) {
-                alert("Selecione um Usuário");
-                return false;
-            }
-
-            var dados = "";
-
-            for (var i = 0; i < selecionados.length; i++) {
-                var selecionado = selecionados[i];
-                selecionado = selecionado.getElementsByTagName("td");
-
-
-                var rota = "contratos/"
-                var rota2 = document.getElementById('salvar').value = selecionado[0].innerHTML
-
-                document.frm_.action = `${rota} ${rota2}`;
-                document.frm_.submit();
-
-            }
-        });
-
     </script>
 </body>
 

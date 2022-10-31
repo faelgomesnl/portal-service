@@ -56,6 +56,25 @@
         </li>
         {{else}}
 
+        {{!-- ACESSO OS'S ABERTURA EQUIPE C.O --}}
+        {{#if user.AD_ABERTURACO}}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Ordem De Serviço
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="/links">OS Abertas</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/links/orderserv">Abertura De OS</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+
+        {{else}}
+
         {{!-- ACESSO OS'S TÉCNICOS --}}
         {{#if user.AD_TECNICOSC}}
         <li class="nav-item dropdown">
@@ -124,6 +143,7 @@
         <li class="nav-item">
           <a class="nav-link" href="/signin">Login</a>
         </li>
+        {{/if}}
         {{/if}}
         {{/if}}
         {{/if}}
